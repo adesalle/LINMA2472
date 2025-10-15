@@ -1,27 +1,60 @@
 module VectReverse
 
 mutable struct VectNode
-    # TODO
+    op::Union{Nothing,Symbol}
+    args::Vector{VectNode}
+    value::AbstractArray{Float64}     
+    derivative::AbstractArray{Float64}
+end
+
+# Constructor for leaf nodes (initial values)
+function VectNode(value::AbstractArray{Float64})
+    return VectNode(nothing, VectNode[], value, zero(value))
+end
+
+# Constructor for operation nodes
+function VectNode(op::Symbol, args::Vector{VectNode}, value::AbstractArray{Float64})
+    return VectNode(op, args, value, zero(value))
 end
 
 # For `tanh.(X)`
 function Base.broadcasted(op::Function, x::VectNode)
-    error("TODO")
+    if op !== tanh
+		error("Only tanh is implemented")
+	end
+	value = tanh.(x.value)
+	return VectNode(:tanh, [x], value)
 end
 
 # For `X .* Y`
 function Base.broadcasted(op::Function, x::VectNode, y::VectNode)
-    error("TODO")
+    if op !== (*)
+		error("Only element-wise multiplication is implemented")
+	end
+	value = x.value .* y.value
+	return VectNode(:.*, [x, y], value)
 end
 
 # For `X .* Y` where `Y` is a constant
 function Base.broadcasted(op::Function, x::VectNode, y::Union{AbstractArray,Number})
-    error("TODO")
+    if op !== (*)
+		error("This operation is not implemented")
+	end
+	if op === (^)
+		value = x.value .^ y
+		return VectNode(:.^, [x, y], value)
+	end
+	value = x.value .* y
+	return VectNode(:.*, [x, y], value)
 end
 
 # For `X .* Y` where `X` is a constant
 function Base.broadcasted(op::Function, x::Union{AbstractArray,Number}, y::VectNode)
-    error("TODO")
+    if op !== (*)
+		error("Only element-wise multiplication is implemented")
+	end
+	value = x .* y.value
+	return VectNode(:.*, [x, y], value)
 end
 
 # For `x .^ 2`
