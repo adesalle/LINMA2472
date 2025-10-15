@@ -17,6 +17,8 @@ function VectNode(op::Symbol, args::Vector{VectNode}, value::AbstractArray{Float
     return VectNode(op, args, value, zero(value))
 end
 
+# je fais une modif
+
 # For `tanh.(X)`
 function Base.broadcasted(op::Function, x::VectNode)
     if op !== tanh
