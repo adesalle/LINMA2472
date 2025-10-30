@@ -17,8 +17,6 @@ function VectNode(op::Symbol, args::Vector{VectNode}, value::AbstractArray{Float
     return VectNode(op, args, value, zero(value))
 end
 
-# je fais une modif
-
 # For `tanh.(X)`
 function Base.broadcasted(op::Function, x::VectNode)
     if op !== tanh
@@ -87,3 +85,19 @@ end
 gradient(f, x) = gradient!(f, zero(x), x)
 
 end
+
+
+# End of part 1 : Benchmark your implementation and comment on the result, e.g., 
+# What is the bottleneck in the computation of the gradient ? Does this match your expectation/complexity analysis ? 
+# How would the memory and time requirement evolve with the size of the neural network ? 
+# How could this be reduced ?
+
+# ∇f = @time VectReverse.gradient(quad, x)
+# @benchmark $VectReverse.gradient($L, $w)
+
+# @profview VectReverse.gradient(L, w)
+
+# If you see a high number of allocations, this may also be a sign of performance issue.
+# You can investigate where they come from with
+
+# @profview_allocs VectReverse.gradient(L, w)
